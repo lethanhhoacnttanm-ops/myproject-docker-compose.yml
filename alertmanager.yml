@@ -1,0 +1,29 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'lethanhhoa.cntt.anm@gmail.com'
+  smtp_auth_username: 'lethanhhoa.cntt.anm@gmail.com'
+  smtp_auth_password: 'surs nbji ydfb mkke'   # App Password Gmail
+  smtp_require_tls: true
+  resolve_timeout: 5m
+
+route:
+  receiver: 'gmail-alert'
+  routes:
+    - match:
+        severity: critical
+      receiver: 'gmail-alert'
+    - match:
+        severity: warning
+      receiver: 'webhook-alert'
+
+receivers:
+  # Receiver gửi Email
+  - name: 'gmail-alert'
+    email_configs:
+      - to: 'lethanhhoa.cntt.anm@gmail.com'
+        send_resolved: true
+
+  # Receiver gọi webhook (auto-recovery)
+  - name: 'webhook-alert'
+    webhook_configs:
+      - url: 'http://host.docker.internal:5001/recover'

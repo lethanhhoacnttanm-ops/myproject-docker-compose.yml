@@ -1,0 +1,47 @@
+groups:
+  - name: container_alerts
+    rules:
+      # Cảnh báo khi service bị down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service down (instance={{ $labels.instance }})"
+
+      # Cảnh báo khi CPU container cao
+      - alert: HighCPUContainer
+        expr: rate(container_cpu_usage_seconds_total[1m]) > 0.5
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected (instance={{ $labels.instance }})"
+
+      # Cảnh báo 
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[1m]) > 0.7
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+
+      # Cảnh báo 
+      - alert: HighMemoryUsage
+        expr: container_memory_usage_bytes > 500000000   # >500MB
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+
+      # Cảnh báo 
+      - alert: DiskAlmostFull
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.8
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk almost full on {{ $labels.instance }}"
